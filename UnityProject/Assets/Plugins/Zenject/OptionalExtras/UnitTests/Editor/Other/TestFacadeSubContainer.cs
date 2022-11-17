@@ -13,8 +13,7 @@ namespace Zenject.Tests.Other
         public void Test1()
         {
             NumInstalls = 0;
-            InitTest.WasRun = false;
-            TickTest.WasRun = false;
+
             DisposeTest.WasRun = false;
 
             var container = new DiContainer();
@@ -28,14 +27,11 @@ namespace Zenject.Tests.Other
 
             var disposeManager = container.Resolve<DisposableManager>();
 
-            Assert.That(!InitTest.WasRun);
-            Assert.That(!TickTest.WasRun);
             Assert.That(!DisposeTest.WasRun);
 
             disposeManager.Dispose();
 
-            Assert.That(InitTest.WasRun);
-            Assert.That(TickTest.WasRun);
+
             Assert.That(DisposeTest.WasRun);
         }
 
@@ -44,34 +40,11 @@ namespace Zenject.Tests.Other
             NumInstalls++;
 
             subContainer.Bind<FooKernel>().AsSingle();
-
-            subContainer.Bind<IInitializable>().To<InitTest>().AsSingle();
-            subContainer.Bind<ITickable>().To<TickTest>().AsSingle();
             subContainer.Bind<IDisposable>().To<DisposeTest>().AsSingle();
         }
 
         public class FooKernel : Kernel
         {
-        }
-
-        public class InitTest : IInitializable
-        {
-            public static bool WasRun;
-
-            public void Initialize()
-            {
-                WasRun = true;
-            }
-        }
-
-        public class TickTest : ITickable
-        {
-            public static bool WasRun;
-
-            public void Tick()
-            {
-                WasRun = true;
-            }
         }
 
         public class DisposeTest : IDisposable

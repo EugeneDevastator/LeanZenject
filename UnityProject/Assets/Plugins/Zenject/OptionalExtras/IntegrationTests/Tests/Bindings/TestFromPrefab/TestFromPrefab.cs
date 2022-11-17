@@ -181,41 +181,9 @@ namespace Zenject.Tests.Bindings
             yield break;
         }
 
-        [UnityTest]
-        public IEnumerator TestCircularDependencies()
-        {
-            PreInstall();
-            // Jim and Bob both depend on each other
-            Container.Bind(typeof(Jim), typeof(Bob)).FromComponentInNewPrefab(JimAndBobPrefab).AsSingle().NonLazy();
-            Container.BindInterfacesTo<JimAndBobRunner>().AsSingle().NonLazy();
-
-            PostInstall();
-            yield break;
-        }
-
         GameObject GetPrefab(string name)
         {
             return FixtureUtil.GetPrefab("TestFromPrefab/{0}".Fmt(name));
-        }
-
-        public class JimAndBobRunner : IInitializable
-        {
-            readonly Bob _bob;
-            readonly Jim _jim;
-
-            public JimAndBobRunner(Jim jim, Bob bob)
-            {
-                _bob = bob;
-                _jim = jim;
-            }
-
-            public void Initialize()
-            {
-                Assert.IsNotNull(_jim.Bob);
-                Assert.IsNotNull(_bob.Jim);
-
-                Log.Info("Jim and bob successfully got the other reference");
-            }
         }
     }
 }
