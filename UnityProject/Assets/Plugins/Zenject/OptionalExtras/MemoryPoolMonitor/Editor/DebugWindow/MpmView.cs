@@ -9,7 +9,7 @@ using Zenject;
 
 namespace Zenject.MemoryPoolMonitor
 {
-    public class MpmView : IGuiRenderable, ITickable, IInitializable
+    public class MpmView : IGuiRenderable
     {
         readonly Settings _settings;
         readonly MpmWindow _window;
@@ -138,31 +138,31 @@ namespace Zenject.MemoryPoolMonitor
                 return _lineTexture;
             }
         }
-
-        public void Initialize()
-        {
-            StaticMemoryPoolRegistry.PoolAdded += OnPoolListChanged;
-            StaticMemoryPoolRegistry.PoolRemoved += OnPoolListChanged;
-            _poolListDirty = true;
-        }
+//TODO Find workaround tickables.
+      // public void Initialize()
+      // {
+      //     StaticMemoryPoolRegistry.PoolAdded += OnPoolListChanged;
+      //     StaticMemoryPoolRegistry.PoolRemoved += OnPoolListChanged;
+      //     _poolListDirty = true;
+      // }
 
         void OnPoolListChanged(IMemoryPool pool)
         {
             _poolListDirty = true;
         }
 
-        public void Tick()
-        {
-            if (_poolListDirty)
-            {
-                _poolListDirty = false;
+      // public void Tick()
+      // {
+      //     if (_poolListDirty)
+      //     {
+      //         _poolListDirty = false;
 
-                _pools.Clear();
-                _pools.AddRange(StaticMemoryPoolRegistry.Pools.Where(ShouldIncludePool));
-            }
+      //         _pools.Clear();
+      //         _pools.AddRange(StaticMemoryPoolRegistry.Pools.Where(ShouldIncludePool));
+      //     }
 
-            InPlaceStableSort<IMemoryPool>.Sort(_pools, ComparePools);
-        }
+      //     InPlaceStableSort<IMemoryPool>.Sort(_pools, ComparePools);
+      // }
 
         bool ShouldIncludePool(IMemoryPool pool)
         {

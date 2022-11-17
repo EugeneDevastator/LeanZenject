@@ -6,10 +6,7 @@ namespace Zenject.Tests
     [TestFixture]
     public class TestValidation
     {
-        DiContainer Container
-        {
-            get; set;
-        }
+        DiContainer Container { get; set; }
 
         [SetUp]
         public void Setup()
@@ -69,12 +66,12 @@ namespace Zenject.Tests
         public void TestSubContainerMethodSuccess()
         {
             Container.Bind<Qux>().FromSubContainerResolve().ByMethod(
-                container =>
-                {
-                    container.Bind<Qux>().AsSingle();
-                    container.Bind<Foo>().AsSingle();
-                    container.Bind<Bar>().AsSingle();
-                })
+                    container =>
+                    {
+                        container.Bind<Qux>().AsSingle();
+                        container.Bind<Foo>().AsSingle();
+                        container.Bind<Bar>().AsSingle();
+                    })
                 .AsSingle();
 
             Container.ResolveRoots();
@@ -84,11 +81,11 @@ namespace Zenject.Tests
         public void TestSubContainerMethodFailure()
         {
             Container.Bind<Qux>().FromSubContainerResolve().ByMethod(
-                container =>
-                {
-                    container.Bind<Qux>().AsSingle();
-                    container.Bind<Bar>().AsSingle();
-                })
+                    container =>
+                    {
+                        container.Bind<Qux>().AsSingle();
+                        container.Bind<Bar>().AsSingle();
+                    })
                 .AsSingle();
 
             Assert.Throws(() => Container.ResolveRoots());
@@ -146,20 +143,9 @@ namespace Zenject.Tests
             Assert.IsEqual(Container.Resolve<Loy>().CallCount, 1);
         }
 
-        public class Loy : IValidatable, IInitializable, ITickable
+        public class Loy : IValidatable
         {
-            public int CallCount
-            {
-                get; set;
-            }
-
-            public void Initialize()
-            {
-            }
-
-            public void Tick()
-            {
-            }
+            public int CallCount { get; set; }
 
             public void Validate()
             {
@@ -169,8 +155,7 @@ namespace Zenject.Tests
 
         public class Jaze
         {
-            [Inject]
-            public LazyInject<Qux> Qux;
+            [Inject] public LazyInject<Qux> Qux;
         }
 
         public class QuxInstaller : Installer<QuxInstaller>
@@ -211,10 +196,7 @@ namespace Zenject.Tests
 
         public class Gorp : IGorp, IValidatable
         {
-            public static int CallCount
-            {
-                get; set;
-            }
+            public static int CallCount { get; set; }
 
             public void Validate()
             {
@@ -223,4 +205,3 @@ namespace Zenject.Tests
         }
     }
 }
-

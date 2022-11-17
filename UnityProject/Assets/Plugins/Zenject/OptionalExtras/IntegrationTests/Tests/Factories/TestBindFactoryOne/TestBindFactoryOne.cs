@@ -77,8 +77,6 @@ namespace Zenject.Tests.Factories
             PreInstall();
             Container.BindFactory<string, Foo, Foo.Factory>().FromNewComponentOnNewGameObject();
 
-            AddFactoryUser<Foo, Foo.Factory>();
-
             PostInstall();
 
             FixtureUtil.AssertComponentCount<Foo>(1);
@@ -91,8 +89,6 @@ namespace Zenject.Tests.Factories
         {
             PreInstall();
             Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>().FromNewComponentOnNewGameObject();
-
-            AddFactoryUser<IFoo, IFooFactory>();
 
             PostInstall();
 
@@ -109,8 +105,6 @@ namespace Zenject.Tests.Factories
 
             Container.BindFactory<string, Foo, Foo.Factory>().FromNewComponentOn(gameObject);
 
-            AddFactoryUser<Foo, Foo.Factory>();
-
             PostInstall();
 
             FixtureUtil.AssertComponentCount<Foo>(1);
@@ -126,8 +120,6 @@ namespace Zenject.Tests.Factories
 
             Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>().FromNewComponentOn(gameObject);
 
-            AddFactoryUser<IFoo, IFooFactory>();
-
             PostInstall();
 
             FixtureUtil.AssertComponentCount<Foo>(1);
@@ -140,8 +132,6 @@ namespace Zenject.Tests.Factories
         {
             PreInstall();
             Container.BindFactory<string, Foo, Foo.Factory>().FromComponentInNewPrefab(FooPrefab).WithGameObjectName("asdf");
-
-            AddFactoryUser<Foo, Foo.Factory>();
 
             PostInstall();
 
@@ -158,8 +148,6 @@ namespace Zenject.Tests.Factories
             Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>()
                 .FromComponentInNewPrefab(FooPrefab).WithGameObjectName("asdf");
 
-            AddFactoryUser<IFoo, IFooFactory>();
-
             PostInstall();
 
             FixtureUtil.AssertComponentCount<Foo>(1);
@@ -173,8 +161,6 @@ namespace Zenject.Tests.Factories
         {
             PreInstall();
             Container.BindFactory<string, Foo, Foo.Factory>().FromComponentInNewPrefabResource("TestBindFactoryOne/Foo").WithGameObjectName("asdf");
-
-            AddFactoryUser<Foo, Foo.Factory>();
 
             PostInstall();
 
@@ -191,8 +177,6 @@ namespace Zenject.Tests.Factories
             Container.BindFactory<string, IFoo, IFooFactory>().To<Foo>()
                 .FromComponentInNewPrefabResource("TestBindFactoryOne/Foo").WithGameObjectName("asdf");
 
-            AddFactoryUser<IFoo, IFooFactory>();
-
             PostInstall();
 
             FixtureUtil.AssertComponentCount<Foo>(1);
@@ -208,8 +192,6 @@ namespace Zenject.Tests.Factories
             Container.BindFactory<string, Foo, Foo.Factory>()
                 .FromSubContainerResolve().ByNewContextPrefab<FooInstaller>(FooSubContainerPrefab);
 
-            AddFactoryUser<Foo, Foo.Factory>();
-
             PostInstall();
 
             FixtureUtil.AssertComponentCount<Foo>(1);
@@ -223,8 +205,6 @@ namespace Zenject.Tests.Factories
             PreInstall();
             Container.BindFactory<string, IFoo, IFooFactory>()
                 .To<Foo>().FromSubContainerResolve().ByNewContextPrefab<FooInstaller>(FooSubContainerPrefab);
-
-            AddFactoryUser<IFoo, IFooFactory>();
 
             PostInstall();
 
@@ -240,8 +220,6 @@ namespace Zenject.Tests.Factories
             Container.BindFactory<string, Foo, Foo.Factory>()
                 .FromSubContainerResolve().ByNewContextPrefabResource<FooInstaller>("TestBindFactoryOne/FooSubContainer");
 
-            AddFactoryUser<Foo, Foo.Factory>();
-
             PostInstall();
 
             FixtureUtil.AssertComponentCount<Foo>(1);
@@ -256,42 +234,11 @@ namespace Zenject.Tests.Factories
             Container.BindFactory<string, IFoo, IFooFactory>()
                 .To<Foo>().FromSubContainerResolve().ByNewContextPrefabResource<FooInstaller>("TestBindFactoryOne/FooSubContainer");
 
-            AddFactoryUser<IFoo, IFooFactory>();
-
             PostInstall();
 
             FixtureUtil.AssertComponentCount<Foo>(1);
             FixtureUtil.AssertNumGameObjects(1);
             yield break;
-        }
-
-        void AddFactoryUser<TValue, TFactory>()
-            where TValue : IFoo
-            where TFactory : PlaceholderFactory<string, TValue>
-        {
-            Container.Bind<IInitializable>()
-                .To<FooFactoryTester<TValue, TFactory>>().AsSingle();
-
-            Container.BindExecutionOrder<FooFactoryTester<TValue, TFactory>>(-100);
-        }
-
-        public class FooFactoryTester<TValue, TFactory> : IInitializable
-            where TFactory : PlaceholderFactory<string, TValue>
-            where TValue : IFoo
-        {
-            readonly TFactory _factory;
-
-            public FooFactoryTester(TFactory factory)
-            {
-                _factory = factory;
-            }
-
-            public void Initialize()
-            {
-                Assert.IsEqual(_factory.Create("asdf").Value, "asdf");
-
-                Log.Info("Factory created foo successfully");
-            }
         }
     }
 }

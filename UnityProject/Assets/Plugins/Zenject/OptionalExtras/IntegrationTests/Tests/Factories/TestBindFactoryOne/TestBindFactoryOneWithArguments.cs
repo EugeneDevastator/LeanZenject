@@ -1,5 +1,4 @@
 using System.Collections;
-using ModestTree;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Zenject.Tests.Factories.BindFactoryOne;
@@ -26,8 +25,6 @@ namespace Zenject.Tests.Factories
                 .FromNewComponentOnNewGameObject()
                 .WithArguments(ArgumentValue);
 
-            AddFactoryUser<Foo>();
-
             PostInstall();
 
             FixtureUtil.AssertComponentCount<Foo>(1);
@@ -44,8 +41,6 @@ namespace Zenject.Tests.Factories
                 .FromNewComponentOnNewGameObject()
                 .WithArguments(ArgumentValue);
 
-            AddFactoryUser<IFoo>();
-
             PostInstall();
 
             FixtureUtil.AssertComponentCount<Foo>(1);
@@ -61,8 +56,6 @@ namespace Zenject.Tests.Factories
                 .FromComponentInNewPrefab(FooPrefab)
                 .WithGameObjectName("asdf")
                 .WithArguments(ArgumentValue);
-
-            AddFactoryUser<Foo>();
 
             PostInstall();
 
@@ -82,8 +75,6 @@ namespace Zenject.Tests.Factories
                 .WithGameObjectName("asdf")
                 .WithArguments(ArgumentValue);
 
-            AddFactoryUser<IFoo>();
-
             PostInstall();
 
             FixtureUtil.AssertComponentCount<Foo>(1);
@@ -100,8 +91,6 @@ namespace Zenject.Tests.Factories
                 .FromComponentInNewPrefabResource("TestBindFactoryOne/Foo")
                 .WithGameObjectName("asdf")
                 .WithArguments(ArgumentValue);
-
-            AddFactoryUser<Foo>();
 
             PostInstall();
 
@@ -120,8 +109,6 @@ namespace Zenject.Tests.Factories
                 .WithGameObjectName("asdf")
                 .WithArguments(ArgumentValue);
 
-            AddFactoryUser<IFoo>();
-
             PostInstall();
 
             FixtureUtil.AssertComponentCount<Foo>(1);
@@ -131,33 +118,6 @@ namespace Zenject.Tests.Factories
         }
 
         // Note that unlike the TestBindFactory tests, WithArguments still doesn't work nicely with subcontainers...
-
-        void AddFactoryUser<TValue>()
-            where TValue : IFoo
-        {
-            Container.Bind<IInitializable>()
-                .To<FooFactoryTester<TValue>>().AsSingle();
-
-            Container.BindExecutionOrder<FooFactoryTester<TValue>>(-100);
-        }
-
-        public class FooFactoryTester<TValue> : IInitializable
-            where TValue : IFoo
-        {
-            readonly IFactory<TValue> _factory;
-
-            public FooFactoryTester(IFactory<TValue> factory)
-            {
-                _factory = factory;
-            }
-
-            public void Initialize()
-            {
-                Assert.IsEqual(_factory.Create().Value, ArgumentValue);
-
-                Log.Info("Factory created foo successfully");
-            }
-        }
     }
 }
 

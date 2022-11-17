@@ -141,39 +141,6 @@ namespace Zenject.Tests.Bindings
             Assert.Throws(() => PostInstall());
             yield break;
         }
-
-        [UnityTest]
-        public IEnumerator TestCircularDependencies()
-        {
-            PreInstall();
-            // Jim and Bob both depend on each other
-            Container.Bind(typeof(Jim), typeof(Bob)).FromComponentInNewPrefabResource(PathPrefix + "JimAndBob").AsSingle().NonLazy();
-
-            Container.BindInterfacesTo<JimAndBobRunner>().AsSingle().NonLazy();
-
-            PostInstall();
-            yield break;
-        }
-
-        public class JimAndBobRunner : IInitializable
-        {
-            readonly Bob _bob;
-            readonly Jim _jim;
-
-            public JimAndBobRunner(Jim jim, Bob bob)
-            {
-                _bob = bob;
-                _jim = jim;
-            }
-
-            public void Initialize()
-            {
-                Assert.IsNotNull(_jim.Bob);
-                Assert.IsNotNull(_bob.Jim);
-
-                Log.Info("Jim and bob successfully got the other reference");
-            }
-        }
     }
 }
 

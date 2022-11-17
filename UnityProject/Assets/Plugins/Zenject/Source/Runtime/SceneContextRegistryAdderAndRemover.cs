@@ -2,7 +2,7 @@ using System;
 
 namespace Zenject
 {
-    public class SceneContextRegistryAdderAndRemover : IInitializable, IDisposable
+    public class SceneContextRegistryAdderAndRemover : IDisposable
     {
         readonly SceneContextRegistry _registry;
         readonly SceneContext _sceneContext;
@@ -14,10 +14,6 @@ namespace Zenject
         {
             _registry = registry;
             _sceneContext = sceneContext;
-        }
-
-        public void Initialize()
-        {
             _registry.Add(_sceneContext);
         }
 
