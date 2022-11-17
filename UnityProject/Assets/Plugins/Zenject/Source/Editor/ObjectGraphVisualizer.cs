@@ -22,7 +22,6 @@ namespace Zenject
             var ignoreTypes = new List<Type>
             {
                 typeof(DiContainer),
-                typeof(InitializableManager)
             };
 
             ignoreTypes.AddRange(externalIgnoreTypes);

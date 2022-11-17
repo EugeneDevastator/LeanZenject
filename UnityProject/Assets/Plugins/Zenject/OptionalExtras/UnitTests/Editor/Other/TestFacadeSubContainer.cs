@@ -19,23 +19,19 @@ namespace Zenject.Tests.Other
 
             var container = new DiContainer();
 
-            container.Bind(typeof(TickableManager), typeof(InitializableManager), typeof(DisposableManager))
+            container.Bind( typeof(DisposableManager))
                 .ToSelf().AsSingle().CopyIntoAllSubContainers();
 
             // This is how you add ITickables / etc. within sub containers
             container.BindInterfacesAndSelfTo<FooKernel>()
                 .FromSubContainerResolve().ByMethod(InstallFoo).AsSingle();
 
-            var tickManager = container.Resolve<TickableManager>();
-            var initManager = container.Resolve<InitializableManager>();
             var disposeManager = container.Resolve<DisposableManager>();
 
             Assert.That(!InitTest.WasRun);
             Assert.That(!TickTest.WasRun);
             Assert.That(!DisposeTest.WasRun);
 
-            initManager.Initialize();
-            tickManager.Update();
             disposeManager.Dispose();
 
             Assert.That(InitTest.WasRun);

@@ -93,14 +93,6 @@ namespace Zenject
             _sceneContext.Resolve();
 
             Container.Inject(this);
-
-            if (!Container.IsValidating)
-            {
-                // We don't have to do this here but it's kind of convenient
-                // We could also remove it and just require that users add a yield after calling
-                // and it would have the same effect
-                Container.Resolve<MonoKernel>().Initialize();
-            }
         }
 
         protected IEnumerator DestroyEverything()

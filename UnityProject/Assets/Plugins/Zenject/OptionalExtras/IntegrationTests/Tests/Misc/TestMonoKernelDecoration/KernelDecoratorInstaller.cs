@@ -8,7 +8,6 @@ namespace Zenject.Tests.TestAnimationStateBehaviourInject
         public override void InstallBindings()
         {
             Container.BindInterfacesTo<DecoratableMonoKernel>().AsCached();
-            Container.Decorate<IDecoratableMonoKernel>().With<DelayedInitializeKernel>();
         }
     }
 }

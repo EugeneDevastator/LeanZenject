@@ -142,38 +142,6 @@ namespace Zenject.Tests.Bindings
             public List<IAsyncInject> asyncInjects;
 
             public bool IsPreloadCompleted { get; private set; }
-
-            public async override void Initialize()
-            {
-                foreach (IAsyncInject inject in asyncInjects)
-                {
-                    if (!inject.IsCompleted)
-                    {
-                        await Task.Delay(1);
-                    }
-                }
-
-                IsPreloadCompleted = true;
-                DecoratedMonoKernel.Initialize();
-            }
-
-            public override void Update()
-            {
-                if (!IsPreloadCompleted)
-                {
-                    return;
-                }
-                DecoratedMonoKernel.Update();
-            }
-
-            public override void FixedUpdate()
-            {
-                if (!IsPreloadCompleted)
-                {
-                    
-                }
-                DecoratedMonoKernel.FixedUpdate();
-            }
         }
     }
 

@@ -50,38 +50,6 @@ namespace Zenject.Tests.Bindings
             subContainer.BindInterfacesAndSelfTo<Foo>().AsSingle();
         }
 
-        [Test]
-        public void TestByInstaller()
-        {
-            Container.Bind<FooFacade>().FromSubContainerResolve()
-                .ByInstaller<FooInstaller>().WithKernel().AsSingle();
-
-            ZenjectManagersInstaller.Install(Container);
-            Container.ResolveRoots();
-
-            var facade = Container.Resolve<FooFacade>();
-
-            Assert.That(!facade.Foo.WasInitialized);
-            Container.Resolve<InitializableManager>().Initialize();
-            Assert.That(facade.Foo.WasInitialized);
-        }
-
-        [Test]
-        public void TestByMethod()
-        {
-            Container.Bind<FooFacade>().FromSubContainerResolve()
-                .ByMethod(InstallFoo).WithKernel().AsSingle();
-
-            ZenjectManagersInstaller.Install(Container);
-            Container.ResolveRoots();
-
-            var facade = Container.Resolve<FooFacade>();
-
-            Assert.That(!facade.Foo.WasInitialized);
-            Container.Resolve<InitializableManager>().Initialize();
-            Assert.That(facade.Foo.WasInitialized);
-        }
-
         public class FooKernel : Kernel
         {
         }
@@ -97,52 +65,6 @@ namespace Zenject.Tests.Bindings
             {
                 InitializeCount = ++GlobalInitializeCount;
             }
-        }
-
-        [Test]
-        public void TestByInstallerCustomOrder()
-        {
-            GlobalInitializeCount = 0;
-
-            Container.BindInterfacesAndSelfTo<Bar>().AsSingle();
-            Container.Bind<FooFacade>().FromSubContainerResolve()
-                .ByInstaller<FooInstaller>().WithKernel<FooKernel>().AsSingle();
-
-            ZenjectManagersInstaller.Install(Container);
-            Container.ResolveRoots();
-
-            var facade = Container.Resolve<FooFacade>();
-
-            Assert.That(!facade.Foo.WasInitialized);
-            Container.Resolve<InitializableManager>().Initialize();
-            Assert.That(facade.Foo.WasInitialized);
-
-            Assert.IsEqual(Container.Resolve<Bar>().InitializeCount, 1);
-            Assert.IsEqual(facade.Foo.InitializeCount, 2);
-        }
-
-        [Test]
-        public void TestByInstallerCustomOrder2()
-        {
-            GlobalInitializeCount = 0;
-
-            Container.BindInterfacesAndSelfTo<Bar>().AsSingle();
-            Container.Bind<FooFacade>().FromSubContainerResolve()
-                .ByInstaller<FooInstaller>().WithKernel<FooKernel>().AsSingle();
-
-            Container.BindExecutionOrder<FooKernel>(-1);
-
-            ZenjectManagersInstaller.Install(Container);
-            Container.ResolveRoots();
-
-            var facade = Container.Resolve<FooFacade>();
-
-            Assert.That(!facade.Foo.WasInitialized);
-            Container.Resolve<InitializableManager>().Initialize();
-            Assert.That(facade.Foo.WasInitialized);
-
-            Assert.IsEqual(Container.Resolve<Bar>().InitializeCount, 2);
-            Assert.IsEqual(facade.Foo.InitializeCount, 1);
         }
     }
 }

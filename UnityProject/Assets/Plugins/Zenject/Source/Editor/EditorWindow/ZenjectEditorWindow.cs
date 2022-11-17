@@ -75,8 +75,6 @@ namespace Zenject
 
             _container.QueueForInject(this);
             _container.ResolveRoots();
-
-            _kernel.Initialize();
         }
 
         public virtual void OnDisable()
@@ -94,16 +92,6 @@ namespace Zenject
             if (_fatalError != null)
             {
                 return;
-            }
-
-            try
-            {
-                _kernel.Tick();
-            }
-            catch (Exception e)
-            {
-                Log.ErrorException(e);
-                _fatalError = e;
             }
 
             // We might also consider only calling Repaint when changes occur
