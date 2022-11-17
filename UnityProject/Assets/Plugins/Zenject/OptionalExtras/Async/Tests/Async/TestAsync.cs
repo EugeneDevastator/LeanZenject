@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -82,45 +81,6 @@ namespace Zenject.Tests.Bindings
             Assert.Pass();
         }
 
-        [UnityTest]
-        [Timeout(10500)]
-        public IEnumerator TestPreloading()
-        {
-            PreInstall();
-            for (int i = 0; i < 4; i++)
-            {
-                var index = i;
-                Container.BindAsync<IFoo>().FromMethod(async () =>
-                {
-                    var delayAmount = 100 * (4 - index);
-                    await Task.Delay(delayAmount);
-                    return (IFoo) new Foo();
-                }).AsCached();
-            }
-            
-            Container.BindInterfacesTo<DecoratableMonoKernel>().AsCached();
-            Container.Decorate<IDecoratableMonoKernel>()
-                .With<PreloadAsyncKernel>();
-            
-            PostInstall();
-
-            var testKernel = Container.Resolve<IDecoratableMonoKernel>() as PreloadAsyncKernel;
-            while (!testKernel.IsPreloadCompleted)
-            {
-                yield return null;
-            }
-
-            foreach (var asycFooUntyped in testKernel.asyncInjects)
-            {
-                var asycFoo = asycFooUntyped as AsyncInject<IFoo>;
-                if (asycFoo.TryGetResult(out IFoo fooAfterLoad))
-                {
-                    Assert.NotNull(fooAfterLoad);
-                    yield break;
-                }
-            }
-        }
-        
         private async void TestAwait(AsyncInject<IFoo> asycFoo)
         {
             awaitReturn = await asycFoo;
@@ -134,14 +94,6 @@ namespace Zenject.Tests.Bindings
         public class Foo : IFoo
         {
         
-        }
-        
-        public class PreloadAsyncKernel: BaseMonoKernelDecorator
-        {
-            [Inject]
-            public List<IAsyncInject> asyncInjects;
-
-            public bool IsPreloadCompleted { get; private set; }
         }
     }
 

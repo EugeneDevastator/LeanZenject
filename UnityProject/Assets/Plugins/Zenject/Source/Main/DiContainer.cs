@@ -20,7 +20,6 @@ namespace Zenject
     [NoReflectionBaking]
     public class DiContainer : IInstantiator
     {
-        readonly Dictionary<Type, IDecoratorProvider> _decorators = new Dictionary<Type, IDecoratorProvider>();
         readonly Dictionary<BindingId, List<ProviderInfo>> _providers = new Dictionary<BindingId, List<ProviderInfo>>();
 
         readonly DiContainer[][] _containerLookups = new DiContainer[4][];
@@ -1123,22 +1122,15 @@ namespace Zenject
                         twice = true;
                     }
 
-                    try
+                    if (twice)
                     {
-                        GetDecoratedInstances(provider, context, instances);
+                        bool removed = providerContainer._resolvesTwiceInProgress.Remove(lookupId);
+                        Assert.That(removed);
                     }
-                    finally
+                    else
                     {
-                        if (twice)
-                        {
-                            bool removed = providerContainer._resolvesTwiceInProgress.Remove(lookupId);
-                            Assert.That(removed);
-                        }
-                        else
-                        {
-                            bool removed = providerContainer._resolvesInProgress.Remove(lookupId);
-                            Assert.That(removed);
-                        }
+                        bool removed = providerContainer._resolvesInProgress.Remove(lookupId);
+                        Assert.That(removed);
                     }
                 }
                 finally
@@ -1146,79 +1138,6 @@ namespace Zenject
                     ZenPools.DespawnLookupId(lookupId);
                 }
             }
-            else
-            {
-                GetDecoratedInstances(provider, context, instances);
-            }
-        }
-
-        public DecoratorToChoiceFromBinder<TContract> Decorate<TContract>()
-        {
-            var bindStatement = StartBinding();
-            var bindInfo = bindStatement.SpawnBindInfo();
-
-            bindInfo.ContractTypes.Add(typeof(IFactory<TContract, TContract>));
-
-            var factoryBindInfo = new FactoryBindInfo(
-                typeof(PlaceholderFactory<TContract, TContract>));
-
-            bindStatement.SetFinalizer(
-                new PlaceholderFactoryBindingFinalizer<TContract>(
-                    bindInfo, factoryBindInfo));
-
-            var bindId = Guid.NewGuid();
-
-            bindInfo.Identifier = bindId;
-
-            IDecoratorProvider decoratorProvider;
-
-            if (!_decorators.TryGetValue(typeof(TContract), out decoratorProvider))
-            {
-                decoratorProvider = new DecoratorProvider<TContract>(this);
-                _decorators.Add(typeof(TContract), decoratorProvider);
-            }
-
-            ((DecoratorProvider<TContract>)decoratorProvider).AddFactoryId(bindId);
-
-            return new DecoratorToChoiceFromBinder<TContract>(
-                this, bindInfo, factoryBindInfo);
-        }
-
-        void GetDecoratedInstances(
-            IProvider provider, InjectContext context, List<object> buffer)
-        {
-            // TODO:  This is flawed since it doesn't allow binding new decorators in subcontainers
-            var decoratorProvider = TryGetDecoratorProvider(context.BindingId.Type);
-
-            if (decoratorProvider != null)
-            {
-                decoratorProvider.GetAllInstances(provider, context, buffer);
-                return;
-            }
-
-            provider.GetAllInstances(context, buffer);
-        }
-
-        IDecoratorProvider TryGetDecoratorProvider(Type contractType)
-        {
-            IDecoratorProvider decoratorProvider;
-
-            if (_decorators.TryGetValue(contractType, out decoratorProvider))
-            {
-                return decoratorProvider;
-            }
-
-            var ancestorContainers = AncestorContainers;
-
-            for (int i = 0; i < ancestorContainers.Length; i++)
-            {
-                if (ancestorContainers[i]._decorators.TryGetValue(contractType, out decoratorProvider))
-                {
-                    return decoratorProvider;
-                }
-            }
-
-            return null;
         }
 
         int GetContainerHeirarchyDistance(DiContainer container)

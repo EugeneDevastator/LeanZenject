@@ -52,36 +52,6 @@ namespace Zenject.Tests.Other
             {
             }
         }
-
-        [Test]
-        public void TestSuccess1()
-        {
-            Container.Bind<ISaveHandler>().To<SaveHandler>().AsSingle();
-            Container.Decorate<ISaveHandler>().With<SaveDecorator1>();
-            Container.Bind<Foo>().AsSingle().NonLazy();
-
-            Container.ResolveRoots();
-        }
-
-        [Test]
-        public void TestFail1()
-        {
-            Container.Bind<ISaveHandler>().To<SaveHandler>().AsSingle();
-            Container.Decorate<ISaveHandler>().With<SaveDecorator1>().FromResolve(Guid.NewGuid());
-            Container.Bind<Foo>().AsSingle().NonLazy();
-
-            Assert.Throws(() => Container.ResolveRoots());
-        }
-
-        [Test]
-        public void TestFail2()
-        {
-            Container.Bind<ISaveHandler>().To<SaveHandler>().FromResolve(Guid.NewGuid()).AsSingle();
-            Container.Decorate<ISaveHandler>().With<SaveDecorator1>();
-            Container.Bind<Foo>().AsSingle().NonLazy();
-
-            Assert.Throws(() => Container.ResolveRoots());
-        }
     }
 }
 

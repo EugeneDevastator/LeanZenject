@@ -10,11 +10,7 @@ namespace Zenject
 {
     public abstract class MonoKernel : MonoBehaviour
     {
-        [InjectLocal]
-        DisposableManager _disposablesManager = null;
-
-        [InjectOptional] 
-        private IDecoratableMonoKernel decoratableMonoKernel;
+        [InjectLocal] DisposableManager _disposablesManager = null;
 
         bool _isDestroyed;
 
@@ -31,16 +27,8 @@ namespace Zenject
                 Assert.That(!_isDestroyed);
                 _isDestroyed = true;
 
-                if (decoratableMonoKernel != null)
-                {
-                    decoratableMonoKernel.Dispose();
-                    decoratableMonoKernel.LateDispose();
-                }
-                else
-                {
-                    _disposablesManager.Dispose();
-                    _disposablesManager.LateDispose();
-                }
+                _disposablesManager.Dispose();
+                _disposablesManager.LateDispose();
             }
         }
     }
